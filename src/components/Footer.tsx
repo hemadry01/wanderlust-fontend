@@ -20,7 +20,7 @@ export default function Footer() {
     setEmail("");
   };
 
-  const year = new Date().getFullYear();
+//   const year = new Date().getFullYear();
 
   return (
     <footer className="bg-[#0D0B0B] px-6 pb-6 pt-12 text-white sm:px-10 sm:pt-16 lg:px-20">
@@ -178,7 +178,7 @@ export default function Footer() {
         <div className="mt-14 border-t border-white/10 pt-5 sm:mt-16">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-[#B5B5B5]">
-              © {year} Wanderlust. All rights reserved.
+              ©  Wanderlust. All rights reserved.
             </p>
 
             {/* Social links */}
@@ -218,28 +218,28 @@ export default function Footer() {
               </a>
 
               <a
-  href="https://instagram.com"
-  target="_blank"
-  rel="noopener noreferrer"
-  aria-label="Instagram"
-  className="text-white transition hover:text-cyan-400"
->
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="h-6 w-6"
-    aria-hidden="true"
-  >
-    <rect x="3" y="3" width="18" height="18" rx="5" />
-    <circle cx="12" cy="12" r="4" />
-    <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" />
-  </svg>
-</a>
+                href="https://instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="text-white transition hover:text-cyan-400"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-6 w-6"
+                  aria-hidden="true"
+                >
+                  <rect x="3" y="3" width="18" height="18" rx="5" />
+                  <circle cx="12" cy="12" r="4" />
+                  <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" />
+                </svg>
+              </a>
             </div>
           </div>
         </div>
