@@ -10,9 +10,11 @@ import {
   Star,
   Trash2,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { IDestination } from "@/type/Destination";
 import EditDestinationDialog from "./EditDestinationDialog";
+import DeleteDestinationDialog from "./DeleteDestinationDialog";
 
 interface ISingleDestinationProps {
   destinationDetail: IDestination;
@@ -46,10 +48,7 @@ const SingleDestination = ({ destinationDetail }: ISingleDestinationProps) => {
         </Link>
         <div className="flex items-center gap-2.5">
           <EditDestinationDialog destinationDetail={destinationDetail} />
-          <Button variant="destructive" size="sm">
-            <Trash2 data-icon="inline-start" />
-            Cancel
-          </Button>
+          <DeleteDestinationDialog destinationDetail={destinationDetail} />
         </div>
       </div>
 
