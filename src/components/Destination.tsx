@@ -54,7 +54,7 @@ const Destination = ({ destination }: IDestinationPromise) => {
         </p>
 
         <Link
-          href="/all-destination"
+          href={`/all-destination/${destination._id}`}
           className="mt-1 inline-flex items-center gap-1 text-xs font-semibold tracking-widest text-[#00A8E8] uppercase transition-colors hover:text-[#0095d1] hover:underline"
         >
           Book Now
