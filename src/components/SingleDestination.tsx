@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";import { Card, CardContent } from "@/components/ui/card";
 import { IDestination } from "@/type/Destination";
+import EditDestinationDialog from "./EditDestinationDialog";
 
 interface ISingleDestinationProps {
   destinationDetail: IDestination;
@@ -44,10 +45,7 @@ const SingleDestination = ({ destinationDetail }: ISingleDestinationProps) => {
           Back to Destinations
         </Link>
         <div className="flex items-center gap-2.5">
-          <Button variant="outline" size="sm">
-            <Pencil data-icon="inline-start" />
-            Edit
-          </Button>
+          <EditDestinationDialog destinationDetail={destinationDetail} />
           <Button variant="destructive" size="sm">
             <Trash2 data-icon="inline-start" />
             Cancel
