@@ -4,7 +4,7 @@ import { cn } from "cn";
 
 const navLinks = [
   { href: "/", label: "Home", active: true },
-  { href: "/destinations", label: "Destinations", active: false },
+  { href: "/all-destination", label: "All Destination", active: false },
   { href: "/add-destination", label: "Add Destination", active: false },
   { href: "/my-bookings", label: "My Bookings", active: false },
 ];

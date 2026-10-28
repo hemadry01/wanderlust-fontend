@@ -1,0 +1,56 @@
+[
+  {
+    "id": 1,
+    "name": "Bali Paradise",
+    "country": "Nepal",
+    "price": 2700,
+    "duration": "7 Days/6 Nights",
+    "rating": 4.5,
+    "image": "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": 2,
+    "name": "Maldives Escape",
+    "country": "Maldives",
+    "price": 3200,
+    "duration": "5 Days/4 Nights",
+    "rating": 4.8,
+    "image": "https://images.unsplash.com/photo-1573843981267-be1999ff37cd?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": 3,
+    "name": "Mountain Trek",
+    "country": "Indonesia",
+    "price": 1900,
+    "duration": "6 Days/5 Nights",
+    "rating": 4.6,
+    "image": "https://images.unsplash.com/photo-1551632811-6018df028fa3?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": 4,
+    "name": "Machu Picchu Tour",
+    "country": "Peru",
+    "price": 2400,
+    "duration": "8 Days/7 Nights",
+    "rating": 4.9,
+    "image": "https://images.unsplash.com/photo-1526392060635-9d6019884377?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": 5,
+    "name": "Tropical Beach",
+    "country": "Thailand",
+    "price": 1500,
+    "duration": "4 Days/3 Nights",
+    "rating": 4.4,
+    "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80"
+  },
+  {
+    "id": 6,
+    "name": "Desert Sunset",
+    "country": "Mexico",
+    "price": 1200,
+    "duration": "3 Days/2 Nights",
+    "rating": 4.3,
+    "image": "https://images.unsplash.com/photo-1509316785289-025f5b846b35?auto=format&fit=crop&w=800&q=80"
+  }
+]
