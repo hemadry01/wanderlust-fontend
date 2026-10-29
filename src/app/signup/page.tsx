@@ -22,6 +22,7 @@ const TEAL = "text-[#1d9cbf]";
 
 type FormValues = {
   name: string;
+  image: File | null;
   email: string;
   password: string;
   confirmPassword: string;
@@ -31,6 +32,7 @@ type FieldErrors = Partial<Record<keyof FormValues, string>>;
 
 const initialValues: FormValues = {
   name: "",
+  image: null,
   email: "",
   password: "",
   confirmPassword: "",
@@ -73,9 +75,18 @@ export default function SignUp() {
     setFieldErrors((prev) => ({ ...prev, [name]: undefined }));
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    setValues((prev) => ({ ...prev, image: file }));
+    setFieldErrors((prev) => ({ ...prev, image: undefined }));
+  };
+
   const validate = (): FieldErrors => {
     const errors: FieldErrors = {};
     if (!values.name.trim()) errors.name = "Full name is required.";
+    if (values.image && values.image.size > 2 * 1024 * 1024) {
+      errors.image = "Image must be smaller than 2MB.";
+    }
     if (!values.email.trim()) {
       errors.email = "Email address is required.";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
@@ -194,6 +205,26 @@ export default function SignUp() {
                 </div>
                 {fieldErrors.name ? (
                   <FieldError className="text-xs">{fieldErrors.name}</FieldError>
+                ) : null}
+              </Field>
+
+              <Field data-invalid={fieldErrors.image ? "true" : undefined}>
+                <FieldLabel htmlFor="image" className="text-[13px]">
+                  Profile Image
+                </FieldLabel>
+                <Input
+                  id="image"
+                  name="image"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  aria-invalid={fieldErrors.image ? true : undefined}
+                  className={`!h-10 !rounded-md !border ${fieldErrors.image ? "!border-red-400" : "!border-transparent"} !bg-gray-100 !text-[13px] !text-gray-500 file:mr-3 file:!h-7 file:cursor-pointer file:!rounded-md file:!border-0 file:!bg-[#1d9cbf]/10 file:!px-3 file:!text-[12px] file:!font-medium file:!text-[#1d9cbf] focus-visible:!bg-white focus-visible:!border-[#1d9cbf] focus-visible:!ring-[#1d9cbf]/25`}
+                />
+                {fieldErrors.image ? (
+                  <FieldError className="text-xs">
+                    {fieldErrors.image}
+                  </FieldError>
                 ) : null}
               </Field>
 
