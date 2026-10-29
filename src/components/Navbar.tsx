@@ -74,6 +74,13 @@ export function Navbar() {
             <Popover>
               <PopoverTrigger
                 render={
+
+                  <button
+                    type="button"
+                    className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-[#00A8E8]"
+                    aria-label="Open account menu"
+                  >
+
                   <Avatar>
                     <AvatarImage
                       referrerPolicy="no-referrer"
@@ -81,6 +88,7 @@ export function Navbar() {
                     />
                     <AvatarFallback>{user?.name.charAt(0).toUpperCase()}</AvatarFallback>
                   </Avatar>
+                  </button>
                 }
               />
               <PopoverContent align="start">
