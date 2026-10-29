@@ -1,372 +1,143 @@
 "use client";
-
-import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Mail, Lock, LoaderCircle, User } from "lucide-react";
-
-import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import {
   Field,
-  FieldError,
+  FieldDescription,
+  FieldGroup,
   FieldLabel,
+  FieldSeparator,
 } from "@/components/ui/field";
-
-const TEAL = "text-[#1d9cbf]";
-
-type FormValues = {
-  name: string;
-  image: File | null;
-  email: string;
-  password: string;
-  confirmPassword: string;
-};
-
-type FieldErrors = Partial<Record<keyof FormValues, string>>;
-
-const initialValues: FormValues = {
-  name: "",
-  image: null,
-  email: "",
-  password: "",
-  confirmPassword: "",
-};
-
-function GoogleIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4">
-      <path
-        fill="#4285F4"
-        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1Z"
-      />
-      <path
-        fill="#34A853"
-        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23Z"
-      />
-      <path
-        fill="#FBBC05"
-        d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.07H2.18a11 11 0 0 0 0 9.87l3.66-2.84Z"
-      />
-      <path
-        fill="#EA4335"
-        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15A11 11 0 0 0 2.18 7.07l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38Z"
-      />
-    </svg>
-  );
-}
+import { Input } from "@/components/ui/input";
+import { authClient } from "@/lib/auth-client";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import React from "react";
 
 export default function SignUp() {
-  const router = useRouter();
-  const [values, setValues] = useState<FormValues>(initialValues);
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
-  const [serverError, setServerError] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setValues((prev) => ({ ...prev, [name]: value }));
-    setFieldErrors((prev) => ({ ...prev, [name]: undefined }));
-  };
+  const handleEmailSignUp = async(e:React.SubmitEvent<HTMLElement>)=>{
+    e.preventDefault()
+    const formData = new FormData(e.target);
+    const user = Object.fromEntries(formData.entries()) as {
+      name: string;
+      image: string;
+      email: string;
+      password: string;
+    };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] ?? null;
-    setValues((prev) => ({ ...prev, image: file }));
-    setFieldErrors((prev) => ({ ...prev, image: undefined }));
-  };
+    const{data,error} = await authClient.signUp.email({
+      ...user,
+    })
 
-  const validate = (): FieldErrors => {
-    const errors: FieldErrors = {};
-    if (!values.name.trim()) errors.name = "Full name is required.";
-    if (values.image && values.image.size > 2 * 1024 * 1024) {
-      errors.image = "Image must be smaller than 2MB.";
+    if (data) {
+      redirect("/");
     }
-    if (!values.email.trim()) {
-      errors.email = "Email address is required.";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) {
-      errors.email = "Please enter a valid email address.";
-    }
-    if (!values.password) {
-      errors.password = "Password is required.";
-    } else if (values.password.length < 8) {
-      errors.password = "Password must be at least 8 characters.";
-    }
-    if (!values.confirmPassword) {
-      errors.confirmPassword = "Please confirm your password.";
-    } else if (values.confirmPassword !== values.password) {
-      errors.confirmPassword = "Passwords do not match.";
-    }
-    return errors;
-  };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const errors = validate();
-    setFieldErrors(errors);
-    setServerError("");
-    if (Object.values(errors).some(Boolean)) return;
-
-    setLoading(true);
-    try {
-      const { error } = await authClient.signUp.email({
-        name: values.name.trim(),
-        email: values.email.trim(),
-        password: values.password,
-      });
-      if (error) {
-        setServerError(
-          error.message ||
-            error.statusText ||
-            "Something went wrong. Please try again."
-        );
-        return;
-      }
-      router.push("/");
-    } finally {
-      setLoading(false);
+    if (error) {
+      console.log(error);
     }
-  };
-
-  const handleGoogleSignUp = async () => {
-    setServerError("");
-    setGoogleLoading(true);
-    try {
-      const { error } = await authClient.signIn.social({
-        provider: "google",
-        callbackURL: "/",
-      });
-      if (error) {
-        setServerError(
-          error.message || "Google sign-up is not available right now."
-        );
-        return;
-      }
-      router.push("/");
-    } finally {
-      setGoogleLoading(false);
-    }
-  };
-
-  const inputClass = (invalid: boolean) =>
-    `!h-10 !rounded-md !border ${invalid ? "!border-red-400" : "!border-transparent"} !bg-gray-100 !pl-9 !text-sm !ring-offset-0 focus-visible:!bg-white focus-visible:!border-[#1d9cbf] focus-visible:!ring-[#1d9cbf]/25`;
+  }
 
   return (
-    <div className="flex min-h-svh flex-col items-center justify-center bg-[#eef0f2] px-4 py-12">
-      <div className="flex w-full max-w-sm flex-col items-center">
-        <h1 className="font-serif text-[34px] leading-tight font-semibold text-gray-900">
-          Create Account
-        </h1>
-        <p className="mt-2 text-sm text-gray-500">
-          Start your adventure with Wanderlust
-        </p>
-
-        <Card className="mt-6 w-full gap-5 !rounded-xl border-0 !ring-0 shadow-[0_16px_40px_-12px_rgba(0,0,0,0.12)] [--card-spacing:1.5rem]">
-          <CardContent>
-            <form
-              onSubmit={handleSubmit}
-              className="flex flex-col gap-4"
-              noValidate
-            >
-              {serverError ? (
-                <div
-                  role="alert"
-                  className="rounded-md border border-red-100 bg-red-50 px-3 py-2 text-[13px] text-red-600"
-                >
-                  {serverError}
-                </div>
-              ) : null}
-
-              <Field data-invalid={fieldErrors.name ? "true" : undefined}>
-                <FieldLabel htmlFor="name" className="text-[13px]">
-                  Full Name
-                </FieldLabel>
-                <div className="relative">
-                  <User
-                    aria-hidden="true"
-                    className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-gray-400"
-                  />
-                  <Input
-                    id="name"
-                    name="name"
-                    type="text"
-                    autoComplete="name"
-                    placeholder="Enter your name"
-                    value={values.name}
-                    onChange={handleChange}
-                    aria-invalid={fieldErrors.name ? true : undefined}
-                    className={`${inputClass(Boolean(fieldErrors.name))} !text-[13px]`}
-                  />
-                </div>
-                {fieldErrors.name ? (
-                  <FieldError className="text-xs">{fieldErrors.name}</FieldError>
-                ) : null}
+    <div className="flex flex-col gap-6 max-w-6x mx-auto my-10">
+      <Card>
+        <CardHeader className="text-center">
+          <CardTitle className="text-xl">Welcome back</CardTitle>
+          <CardDescription>
+            Login with your Apple or Google account
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleEmailSignUp}>
+            <FieldGroup>
+              <Field>
+                <Button variant="outline" type="button">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path
+                      d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"
+                      fill="currentColor"
+                    />
+                  </svg>
+                  Login with Apple
+                </Button>
+                <Button variant="outline" type="button">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path
+                      d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                  Login with Google
+                </Button>
+              </Field>
+              <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
+                Or continue with
+              </FieldSeparator>
+              <Field>
+                <FieldLabel htmlFor="name">Name</FieldLabel>
+                <Input
+                  id="name"
+                  type="text"
+                  name="name"
+                  placeholder="Name"
+                  required
+                />
               </Field>
 
-              <Field data-invalid={fieldErrors.image ? "true" : undefined}>
-                <FieldLabel htmlFor="image" className="text-[13px]">
-                  Profile Image
-                </FieldLabel>
+              <Field>
+                <FieldLabel htmlFor="name">ImageURL</FieldLabel>
                 <Input
                   id="image"
+                  type="url"
                   name="image"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  aria-invalid={fieldErrors.image ? true : undefined}
-                  className={`!h-10 !rounded-md !border ${fieldErrors.image ? "!border-red-400" : "!border-transparent"} !bg-gray-100 !text-[13px] !text-gray-500 file:mr-3 file:!h-7 file:cursor-pointer file:!rounded-md file:!border-0 file:!bg-[#1d9cbf]/10 file:!px-3 file:!text-[12px] file:!font-medium file:!text-[#1d9cbf] focus-visible:!bg-white focus-visible:!border-[#1d9cbf] focus-visible:!ring-[#1d9cbf]/25`}
+                  placeholder="Image URL"
+                  required
                 />
-                {fieldErrors.image ? (
-                  <FieldError className="text-xs">
-                    {fieldErrors.image}
-                  </FieldError>
-                ) : null}
               </Field>
 
-              <Field data-invalid={fieldErrors.email ? "true" : undefined}>
-                <FieldLabel htmlFor="email" className="text-[13px]">
-                  Email Address
-                </FieldLabel>
-                <div className="relative">
-                  <Mail
-                    aria-hidden="true"
-                    className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-gray-400"
-                  />
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    placeholder="Enter your email"
-                    value={values.email}
-                    onChange={handleChange}
-                    aria-invalid={fieldErrors.email ? true : undefined}
-                    className={inputClass(Boolean(fieldErrors.email))}
-                  />
+              <Field>
+                <FieldLabel htmlFor="email">Email</FieldLabel>
+                <Input
+                  id="email"
+                  type="email"
+                  name="email"
+                  placeholder="m@example.com"
+                  required
+                />
+              </Field>
+              <Field>
+                <div className="flex items-center">
+                  <FieldLabel htmlFor="password">Password</FieldLabel>
+                  <a
+                    href="#"
+                    className="ml-auto text-sm underline-offset-4 hover:underline"
+                  >
+                    Forgot your password?
+                  </a>
                 </div>
-                {fieldErrors.email ? (
-                  <FieldError className="text-xs">
-                    {fieldErrors.email}
-                  </FieldError>
-                ) : null}
+                <Input id="password" name="password" type="password" required />
               </Field>
-
-              <Field data-invalid={fieldErrors.password ? "true" : undefined}>
-                <FieldLabel htmlFor="password" className="text-[13px]">
-                  Password
-                </FieldLabel>
-                <div className="relative">
-                  <Lock
-                    aria-hidden="true"
-                    className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-gray-400"
-                  />
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="new-password"
-                    placeholder="Create a password"
-                    value={values.password}
-                    onChange={handleChange}
-                    aria-invalid={fieldErrors.password ? true : undefined}
-                    className={inputClass(Boolean(fieldErrors.password))}
-                  />
-                </div>
-                {fieldErrors.password ? (
-                  <FieldError className="text-xs">
-                    {fieldErrors.password}
-                  </FieldError>
-                ) : null}
+              <Field>
+                <Button type="submit">SignUp</Button>
+                <FieldDescription className="text-center">
+                  Have an account? <Link href="/login">Login</Link>
+                </FieldDescription>
               </Field>
-
-              <Field
-                data-invalid={fieldErrors.confirmPassword ? "true" : undefined}
-              >
-                <FieldLabel htmlFor="confirmPassword" className="text-[13px]">
-                  Confirm Password
-                </FieldLabel>
-                <div className="relative">
-                  <Lock
-                    aria-hidden="true"
-                    className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-gray-400"
-                  />
-                  <Input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type="password"
-                    autoComplete="new-password"
-                    placeholder="Confirm your password"
-                    value={values.confirmPassword}
-                    onChange={handleChange}
-                    aria-invalid={
-                      fieldErrors.confirmPassword ? true : undefined
-                    }
-                    className={inputClass(
-                      Boolean(fieldErrors.confirmPassword)
-                    )}
-                  />
-                </div>
-                {fieldErrors.confirmPassword ? (
-                  <FieldError className="text-xs">
-                    {fieldErrors.confirmPassword}
-                  </FieldError>
-                ) : null}
-              </Field>
-
-              <Button
-                type="submit"
-                disabled={loading || googleLoading}
-                className="mt-2 !h-10 w-full !text-[13px] !font-medium !bg-[#1d9cbf] hover:!bg-[#1889ab]"
-              >
-                {loading ? (
-                  <>
-                    <LoaderCircle className="size-4 animate-spin" />
-                    Creating Account...
-                  </>
-                ) : (
-                  "Create Account"
-                )}
-              </Button>
-
-              <div className="flex items-center gap-4 text-xs text-gray-400">
-                <span className="h-px flex-1 bg-gray-200" />
-                Or sign up with
-                <span className="h-px flex-1 bg-gray-200" />
-              </div>
-
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleGoogleSignUp}
-                disabled={loading || googleLoading}
-                className="!h-10 w-full gap-2 !border-gray-200 !bg-white !text-[13px] !font-medium !text-gray-800 hover:!bg-gray-50"
-              >
-                {googleLoading ? (
-                  <LoaderCircle className="size-4 animate-spin text-gray-400" />
-                ) : (
-                  <GoogleIcon />
-                )}
-                Sign Up With Google
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-
-        <p className={`mt-5 text-[13px] text-gray-500`}>
-          Already have an account?{" "}
-          <Link
-            href="/login"
-            className={`${TEAL} font-medium hover:underline`}
-          >
-            Sign In
-          </Link>
-        </p>
-      </div>
+            </FieldGroup>
+          </form>
+        </CardContent>
+      </Card>
+      <FieldDescription className="px-6 text-center">
+        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
+        and <a href="#">Privacy Policy</a>.
+      </FieldDescription>
     </div>
   );
 }
